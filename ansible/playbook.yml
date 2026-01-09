@@ -22,15 +22,6 @@
         state: started
         enabled: true
 
-    - name: Add ec2-user to docker group
-      user:
-        name: ec2-user
-        groups: docker
-        append: yes
-
-    - name: Reset SSH connection to apply group change
-      meta: reset_connection
-
     - name: Pull application image from DockerHub (public)
       docker_image:
         name: "spytroxx/my-tomcat-app"
