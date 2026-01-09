@@ -5,7 +5,7 @@
 
   vars:
     container_name: "tomcat_new"
-    app_port: "8081"
+    app_port: "8082"
     docker_image: "spytroxx/my-tomcat-new"
     docker_tag: "v2"
 
@@ -41,4 +41,4 @@
         state: started
         restart_policy: always
         ports:
-          - "8081:8080"
+          - "8082:8080"
