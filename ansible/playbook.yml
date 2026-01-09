@@ -4,10 +4,9 @@
   become: true
 
   vars:
-    # These are DEFAULTS. They will be overwritten by Jenkins.
-    container_name: "tomcat_prod" 
+    container_name: "tomcat_prod"
     app_port: "8082"
-    docker_image: "spytroxx/my-tomcat-new" 
+    docker_image: "spytroxx/my-tomcat-new"
     docker_tag: "latest"
 
   tasks:
@@ -22,22 +21,32 @@
         state: started
         enabled: true
 
-    - name: Pull application image from DockerHub
-      docker_image:
-        name: "{{ docker_image }}" # Variable
-        tag: "{{ docker_tag }}"    # Variable
-        source: pull
-
-    - name: Stop old container if exists
+    # --- NEW FIX START ---
+    # This task removes the specific OLD name causing the conflict
+    - name: Remove Legacy/Old Container
       docker_container:
-        name: "{{ container_name }}" # Variable
+        name: "tomcat-new"  # The name from your previous hardcoded attempts
+        state: absent
+        force_kill: true
+    # --- NEW FIX END ---
+
+    # This handles the CURRENT container name for future updates
+    - name: Stop current container if exists
+      docker_container:
+        name: "{{ container_name }}"
         state: absent
         force_kill: true
 
+    - name: Pull application image from DockerHub
+      docker_image:
+        name: "{{ docker_image }}"
+        tag: "{{ docker_tag }}"
+        source: pull
+
     - name: Run Tomcat container
       docker_container:
-        name: "{{ container_name }}" # Variable
-        image: "{{ docker_image }}:{{ docker_tag }}" # Combines variables
+        name: "{{ container_name }}"
+        image: "{{ docker_image }}:{{ docker_tag }}"
         state: started
         restart_policy: always
         ports:
