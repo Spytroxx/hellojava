@@ -1,0 +1,53 @@
+---
+- name: Deploy Tomcat Docker container
+  hosts: all
+  become: true
+
+  vars:
+    container_name: "tomcat_app"
+    app_port: "8080"
+    docker_image: "spytroxx/my-tomcat-app"
+    docker_tag: "v1"
+
+  tasks:
+
+    - name: Install Docker (Amazon Linux)
+      yum:
+        name: docker
+        state: present
+
+    - name: Start and enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+
+    - name: Reset SSH connection to apply group change
+      meta: reset_connection
+
+    - name: Pull application image from DockerHub (public)
+      docker_image:
+        name: "spytroxx/my-tomcat-app"
+        tag: "v1"
+        source: pull
+
+    - name: Stop old container if exists
+      docker_container:
+        name: "tomcat-app"
+        state: absent
+        force_kill: true
+
+    - name: Run Tomcat container
+      docker_container:
+        name: "tomcat-app"
+        image: "spytroxx/my-tomcat-app:v1"
+        state: started
+        restart_policy: always
+        ports:
+          - "8080:8080"
