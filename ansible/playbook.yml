@@ -4,10 +4,10 @@
   become: true
 
   vars:
-    container_name: "tomcat_app"
+    container_name: "tomcat_new"
     app_port: "8081"
-    docker_image: "spytroxx/my-tomcat-app"
-    docker_tag: "v1"
+    docker_image: "spytroxx/my-tomcat-new"
+    docker_tag: "v2"
 
   tasks:
 
@@ -24,20 +24,20 @@
 
     - name: Pull application image from DockerHub (public)
       docker_image:
-        name: "spytroxx/my-tomcat-app"
-        tag: "v1"
+        name: "spytroxx/my-tomcat-new"
+        tag: "v2"
         source: pull
 
     - name: Stop old container if exists
       docker_container:
-        name: "tomcat-app"
+        name: "tomcat-new"
         state: absent
         force_kill: true
 
     - name: Run Tomcat container
       docker_container:
-        name: "tomcat-app"
-        image: "spytroxx/my-tomcat-app:v1"
+        name: "tomcat-new"
+        image: "spytroxx/my-tomcat-new:v2"
         state: started
         restart_policy: always
         ports:
